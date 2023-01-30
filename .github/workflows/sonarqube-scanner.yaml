@@ -1,9 +1,16 @@
 name: Build-Test
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
-  build:
+  sonarqube:
+    environment: SCORING
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
     runs-on: ubuntu-latest
 
     steps:
