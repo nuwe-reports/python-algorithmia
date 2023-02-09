@@ -1,0 +1,3 @@
+sonar-project.properties                 @team-nuwe
+/.github/**                              @team-nuwe
+/tests/test_hello.py                     @team-nuwe
