@@ -52,7 +52,10 @@ jobs:
                 if (objective.outcome === 'passed') assertionResults.push(i)
               })
               console.log('Updating score...')
-              
+              await github.request(`PATCH https://api.nuwe.io/projects/${process.env.PROJECT_ID}/objectives`, {
+                bearerToken: process.env.PERSONAL_TOKEN, 
+                assertionResults
+              })
               console.log('Done')
             } catch(err) {
               core.error("Error while reading or parsing the output JSON")
