@@ -32,13 +32,36 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Test with pytest
         run: |
-          pip install pytest
-          pytest
-      - name: Run make file
-        run: |
-          make test
+          pip install pytest pytest-json-report
+          pytest --json-report --json-report-file=output.json --json-report-indent=4
+          
+      - name: Update solution
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            try {
+              const fs = require('fs')
+              const jsonString = fs.readFileSync('./output.json')
+              const output = JSON.parse(jsonString)
+              const assertionResults = []
+              output.tests[0].forEach((objective, i) => {
+                if (objective.outcome === 'passed') assertionResults.push(i)
+              })
+              console.log('Updating score...')
+              await github.request(`PATCH https://api.nuwe.io/projects/${process.env.PROJECT_ID}/objectives`, {
+                bearerToken: process.env.PERSONAL_TOKEN, 
+                assertionResults
+              })
+              console.log('Done')
+            } catch(err) {
+              core.error("Error while reading or parsing the output JSON")
+              core.setFailed(err)
+            }
       
-      - name: SonarQube Scan
+      - name: SonarQube Scan 🚨
+        if: always()
         uses: sonarsource/sonarqube-scan-action@master
         with:
           args: >
