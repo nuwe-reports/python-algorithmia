@@ -45,7 +45,13 @@ jobs:
               const fs = require('fs')
               const jsonString = fs.readFileSync('./output.json')
               const output = JSON.parse(jsonString)
-              console.log(output)
+              const assertionResults = []
+              output.tests.forEach((objective, i) => {
+                if (objective.outcome === 'passed') assertionResults.push(i)
+              })
+              console.log('Updating score...')
+              
+              console.log('Done')
             } catch(err) {
               core.error("Error while reading or parsing the output JSON")
               core.setFailed(err)
